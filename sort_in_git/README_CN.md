@@ -6,6 +6,14 @@
 把他们拷贝到指定的文件夹下面或者子文件下，文件名为sort_XXX 。
 利用git的版本记录来记录所有文件改变的情况。
 
+## 使用库
+
+- git
+- glob
+- time
+- shutil
+- getopt
+
 ## 使用方法
 
     sort_in_git.py [-s <suffix>] [-i <inputfolder>] [option]
