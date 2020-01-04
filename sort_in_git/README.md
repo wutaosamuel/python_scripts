@@ -7,6 +7,14 @@ and copy them into specified directory or sub-directory
 with name 'sort_xxx'.
 The git is used for recording files changed history.
 
+## Libraries
+
+- git
+- glob
+- time
+- shutil
+- getopt
+
 ## Usage
 
     sort_in_git.py [-s <suffix>] [-i <inputfolder>] [option]
