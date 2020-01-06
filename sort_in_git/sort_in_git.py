@@ -15,16 +15,18 @@ import getopt
 class sort_in_git:
 #TODO: remove incorrect suffix file at sort_xxx directory
 
+    # init for sort_in_git
     def __init__(self, suffix=None, in_folder=None, ot_folder=None):
         self.in_folder = in_folder
         self.ot_folder = ot_folder
         self.suffix = suffix
 
+    # recall variables
     def __call__(self, suffix=None, in_folder=None, ot_folder=None):
         self.in_folder = in_folder
         self.ot_folder = ot_folder
         self.suffix = suffix
-
+    # execution for command line
     def exec_opt(self, argv):
         try:
             opts, args = getopt.getopt(argv, "hs:i:o:",
@@ -96,6 +98,8 @@ class sort_in_git:
         repo.git.add(A=True)
         repo.index.commit(git_commit)
         print("finish to add change log")
+
+    #################### HELP ###################
 
     def usage(self):
         print("sort_in_git.py [-s <suffix>] [-i <inputfolder>] [option]")
