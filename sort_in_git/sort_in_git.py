@@ -40,7 +40,7 @@ class sort_in_git:
             sys.exit(2)
 
         for opt, arg in opts:
-            if opt in ("-h", "--help"):
+            if opt in ("-h", "--help", "help"):
                 self.print_help()
             elif opt in ("-s", "--suffix"):
                 self.suffix = arg
@@ -114,7 +114,7 @@ class sort_in_git:
         print("-i, --input \t directory that requires sort ")
         print()
         print("Options: ")
-        print("-h, --help \t list all help and exit")
+        print("-h, --help \t list all helps and exit")
         print("-o, --output \t directory that keeps all sorted file")
         sys.exit(0)
 
