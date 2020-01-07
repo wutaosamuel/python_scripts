@@ -8,11 +8,31 @@ import getopt
 class rename_git:
 
   # init rename_git
-  def __init__(self, in_folder="./", ot_folder="./"):
+  def __init__(self, in_folder=None, ot_folder=None):
     self.in_folder = in_folder
-    self.ot_folder = ot_folder
+    if ot_folder == None:
+      self.ot_folder = in_folder
+    else:
+      self.ot_folder = ot_folder
+    self.char = None
+    self.format = None
+    self.number = 0
+    self.prefix = False
+    self.suffix = False
   
   # recall variables
+  def __call__(self, in_folder=None, ot_folder=None, char=None,
+              format=None, number=0, prefix=False, suffix=True):
+    self.in_folder = in_folder
+    if ot_folder == None:
+      self.ot_folder = in_folder
+    else:
+      self.ot_folder = ot_folder
+    self.char = char
+    self.format = format
+    self.number = number
+    self.prefix = prefix
+    self.suffix = suffix
 
   # execution for command line
   def exec_opt(self, argv):
