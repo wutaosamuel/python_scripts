@@ -5,7 +5,7 @@
 
 import os
 import sys
-import git  # future replace
+import git  # replace pygit2 && future replace
 import glob
 import time
 import shutil
@@ -40,7 +40,7 @@ class sort_in_git:
             sys.exit(2)
 
         for opt, arg in opts:
-            if opt in ("-h", "--help", "help"):
+            if opt in ("-h", "--help"):
                 self.print_help()
             elif opt in ("-s", "--suffix"):
                 self.suffix = arg
@@ -52,6 +52,7 @@ class sort_in_git:
                 # print error info && exit
                 print("sort_in_git.py: invalid option", opt)
                 print("Try \'--help\' for  for more information")
+                sys.exit(2)
         # suffer & input must have value
         if self.suffix == None or self.in_folder == None:
             print("Error: invalid usage")

@@ -8,6 +8,7 @@ import getopt
 class rename_git:
 
   # init rename_git
+  # TODO: set in_folder = None
   def __init__(self, in_folder="./", ot_folder="./"):
     self.in_folder = in_folder
     self.ot_folder = ot_folder
@@ -26,8 +27,27 @@ class rename_git:
 
     # read argv
     for opt, arg in opts:
-      if opt in ("-h", "--help", "help"):
+      if opt in ("-h", "--help"):
         self.print_help()
+      elif opt in ("-i", "--input"):
+        self.in_folder = arg
+      elif opt in ("o", "--output"):
+        self.ot_folder = arg
+      elif opt in ("c", "--char"):
+        self.char = arg
+      elif opt in ("f", "--format"):
+        self.format = arg
+      elif opt in ("n", "--number"):
+        self.number = arg
+      elif opt in ("p", "--prefix"):
+        self.prefix = arg
+      elif opt in ("s", "--suffix"):
+        self.suffix = arg
+      else:
+        # print error info && exit
+        print("sort_in_git.py: invalid option", opt)
+        print("Try \'--help\' for  for more information")
+        sys.exit(2)
     
 
   def exec_git(self):
