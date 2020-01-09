@@ -55,7 +55,7 @@ class sort_in_git:
                 sys.exit(2)
         # suffer & input must have value
         if self.suffix == None or self.in_folder == None:
-            print("Error: invalid usage")
+            print("Error: invalid usage. Must need input folder path!")
             self.usage()
             print("[-h | --help]")
             print()
