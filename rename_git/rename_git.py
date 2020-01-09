@@ -64,13 +64,13 @@ class rename_git:
       elif opt in ("-f", "--form"):
         self.form = arg
       elif opt in ("-n", "--number"):
-        self.number = arg
+        self.number = int(arg)
       elif opt in ("-r", "--rename"):
         self.rename = arg
       elif opt in ("-p", "--prefix"):
-        self.prefix = arg
+        self.prefix = True
       elif opt in ("-s", "--suffix"):
-        self.suffix = arg
+        self.suffix = True
       else:
         # print error info && exit
         print("rename_git.py: invalid option", opt)
@@ -144,25 +144,22 @@ class rename_git:
         for f in self.files:
           os.rename(self.in_folder+f, 
                     self.ot_folder+str(i)+f)
-          i+=1
+          i += 1
       if self.suffix:
         j = self.number
         for f in self.files:
           base_split = os.path.splitext(f)
           os.rename(self.in_folder+f, 
                     self.ot_folder+base_split[0]+str(j)+base_split[1])
-          j+=1
+          j += 1
       # set default
       if not self.prefix and not self.suffix:
         k = self.number
         for f in self.files:
-          print(f)
           base_split = os.path.splitext(f)
-          print(base_split)
           os.rename(self.in_folder+f,
-                    self.ot_folder+base_split[0]+"_"+str(k)+base_split[1])
+                    self.ot_folder+base_split[0]+'_'+str(k)+base_split[1])
           k += 1
-  
   def exec_rename(self):
     # rename combined with number
     if self.rename != None and self.number == -1:
