@@ -1,5 +1,7 @@
 # Aims:
-# 1. rename all file at the same directory
+# 1. rename all file at the same directory with --number
+# 2. add prefix or suffix with --number & --char (fixed)
+# 3. change extention from --form .txt to --char .doc
 
 import os
 import sys
@@ -81,8 +83,6 @@ class rename_git:
     if self.in_folder == None:
       print("Error: invalid usage. Must need input folder path!")
       self.usage()
-      print()
-      print("rename_git.py --help list all helps")
       sys.exit(2)
     self.in_folder = os.path.join(self.in_folder, '')
     if not os.path.exists(self.in_folder):
@@ -96,11 +96,16 @@ class rename_git:
     if not os.path.exists(self.ot_folder):
       print("Error: output folder", self.ot_folder, "not exist")
       sys.exit(2)
-    # if form not None
+    # cannot support to exec prefix and suffix at same time TODO
+    if self.prefix and self.suffix:
+      print("Error: invalid usage. Prefix and Suffix cannot work together for this time!")
+      self.usage()
+      sys.exit(2)
+    # get all files, but if form not None TODO: opt
     if not self.form == None:
-      self.files = [os.path.basename(f) for f in glob.glob(self.in_folder+"*."+self.form)]
+      self.files = [os.path.basename(f) for f in sorted(glob.glob(self.in_folder+"*"+self.form))]
     else:
-      self.files = [os.path.basename(f) for f in glob.glob(self.in_folder+"*.*")]
+      self.files = [os.path.basename(f) for f in sorted(glob.glob(self.in_folder+"*.*"))]
 
   def exec_form(self):
     #check char & form exist
@@ -160,15 +165,13 @@ class rename_git:
           os.rename(self.in_folder+f,
                     self.ot_folder+base_split[0]+'_'+str(k)+base_split[1])
           k += 1
+  
   def exec_rename(self):
     # rename combined with number
     if self.rename != None and self.number == -1:
       print("Error: invalid usage. rename must use number")
       self.usage()
-      print()
-      print("rename_git.py --help list all helps")
       sys.exit(2)
-    # list all files
     if self.prefix:
       i = self.number
       for f in self.files:
@@ -176,8 +179,9 @@ class rename_git:
           i_str = str(i) + self.char
         else:
           i_str = str(i)
+        base_split = os.path.splitext(f)
         os.rename(self.in_folder+f,
-                  self.ot_folder+i_str+f)
+                  self.ot_folder+i_str+self.rename+base_split[1])
         i += 1
     if self.suffix:
       i = self.number
@@ -188,16 +192,20 @@ class rename_git:
           i_str = str(i)
         base_split = os.path.splitext(f)
         os.rename(self.in_folder+f,
-                  self.ot_folder+base_split[0]+i_str+base_split[1])
+                  self.ot_folder+self.rename+i_str+base_split[1])
         i += 1
     # set default
     if not self.prefix and not self.suffix:
       i = self.number
       for f in self.files:
+        if not self.char == None:
+          i_str = self.char + str(i)
+        else:
+          i_str = str(i)
         base_split = os.path.splitext(f)
         os.rename(self.in_folder+f,
-                  self.ot_folder+base_split[0]+"_"+str(i)+base_split[1])
-      i += 1
+                  self.ot_folder+self.rename+"_"+str(i)+base_split[1])
+        i += 1
 
   def exec_git(self):
     pass
@@ -213,19 +221,16 @@ class rename_git:
     else:
       print("Error: unknown error!")
       self.usage()
-      print()
-      print("rename_git.py --help list all helps")
     return
 
   #################### HELP ####################
 
   def print_more_help(self):
-    print("rename_git.py -h || --help for more helps")
+    print("rename_git.py \'-h\' | \'--help\' for more helps")
 
   def usage(self):
     print("rename_git.py [-i <inputfolder>] [option]")
     print("or")
-    print()
     self.print_more_help()
 
   def print_help(self):
