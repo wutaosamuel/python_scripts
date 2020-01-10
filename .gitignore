@@ -2,3 +2,9 @@
 
 # ignore vscode setting 
 .vscode/
+
+# ignore pyinstaller build & dist
+build/
+dist/
+__pycache__/
+*.spec
