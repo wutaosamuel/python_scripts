@@ -5,12 +5,14 @@
 
 import os
 import sys
-import git  # replace pygit2 && future replace
 import glob
 import time
 import shutil
 import getopt
+import configparser
 
+from git import Repo
+from git import exc as GExc
 
 class sort_in_git:
 #TODO: remove incorrect suffix file at sort_xxx directory
@@ -91,11 +93,23 @@ class sort_in_git:
         git_commit = time.strftime("%Y%m%d %H:%M:%S", time.localtime())
         # check .git exit on output folder
         try:
-            repo = git.Repo(self.ot_folder)
+            repo = Repo(self.ot_folder)
             print("git exit, add change log")
-        except git.exc.InvalidGitRepositoryError:
-            repo = git.Repo.init(self.ot_folder)
+        except GExc.InvalidGitRepositoryError:
+            repo = Repo.init(self.ot_folder)
             print("Initialised git")
+        # check .git global config
+        config = repo.config_reader()
+        def check_config(tag="user", opt="name", val="sort_in_git"):
+            try:
+                config.get_value(tag, opt)
+            except configparser.NoSectionError:
+                with repo.config_writer() as w:
+                    w.set_value(tag, opt, val)
+        # check user.name
+        check_config("user","name", "sort_in_git")
+        # check user.email
+        check_config("user","name", "sort_in_git@gmail.com")
         repo.git.add(A=True)
         repo.index.commit(git_commit)
         print("finish to add change log")
