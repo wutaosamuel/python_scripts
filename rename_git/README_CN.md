@@ -20,6 +20,7 @@ extra:
 
     -i, --input     directory of files required to rename
     Option:
+    -g, --git       store git history in git, require git
     -o, --output    directory where renamed fires move to
     -h, --help      list all the helps and exit
     -c, --char      add same char on files, combined with -p | -s

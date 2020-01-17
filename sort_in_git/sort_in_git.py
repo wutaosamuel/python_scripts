@@ -9,7 +9,6 @@ import glob
 import time
 import shutil
 import getopt
-import configparser
 
 from git import Repo
 from git import exc as GExc
@@ -22,6 +21,7 @@ class sort_in_git:
         self.in_folder = in_folder
         self.ot_folder = ot_folder
         self.suffix = suffix
+        self.git = False
 
     # recall variables
     def __call__(self, suffix=None, in_folder=None, ot_folder=None):
@@ -31,8 +31,8 @@ class sort_in_git:
     # execution for command line
     def exec_opt(self, argv):
         try:
-            opts, args = getopt.getopt(argv, "hs:i:o:",
-                                       ["help", "suffix=", "input=", "output="])
+            opts, args = getopt.getopt(argv, "hs:i:o:g",
+                                       ["help", "suffix=", "input=", "output=", "git"])
         except getopt.GetoptError:
             print("Error: invalid usage")
             self.usage()
@@ -50,6 +50,8 @@ class sort_in_git:
                 self.in_folder = arg
             elif opt in ("-o", "--output"):
                 self.ot_folder = arg
+            elif opt in ("-g", "--git"):
+                self.git = True
             else:
                 # print error info && exit
                 print("sort_in_git.py: invalid option", opt)
@@ -98,18 +100,6 @@ class sort_in_git:
         except GExc.InvalidGitRepositoryError:
             repo = Repo.init(self.ot_folder)
             print("Initialised git")
-        # check .git global config
-        config = repo.config_reader()
-        def check_config(tag="user", opt="name", val="sort_in_git"):
-            try:
-                config.get_value(tag, opt)
-            except configparser.NoSectionError:
-                with repo.config_writer() as w:
-                    w.set_value(tag, opt, val)
-        # check user.name
-        check_config("user","name", "sort_in_git")
-        # check user.email
-        check_config("user","name", "sort_in_git@gmail.com")
         repo.git.add(A=True)
         repo.index.commit(git_commit)
         print("finish to add change log")
@@ -131,6 +121,7 @@ class sort_in_git:
         print("Options: ")
         print("-h, --help \t list all helps and exit")
         print("-o, --output \t directory that keeps all sorted file")
+        print("-g, --git \t store git history in git")
         sys.exit(0)
 
 
@@ -138,5 +129,6 @@ if __name__ == "__main__":
     sort = sort_in_git()
     sort.exec_opt(sys.argv[1:])
     sort.exec_sort()
-    sort.exec_git()
+    if sort.git:
+        sort.exec_git()
     print("Sort done!")

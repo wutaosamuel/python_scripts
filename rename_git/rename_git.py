@@ -6,8 +6,11 @@
 import os
 import sys
 import glob
+import time
 import getopt
 
+from git import Repo
+from git import exc as GExc
 
 class rename_git:
     # TODO: allow file[n]
@@ -26,11 +29,12 @@ class rename_git:
         self.prefix = False
         self.suffix = False
         self.files = []
+        self.git = False
 
     # recall variables
     def __call__(self, in_folder=None, ot_folder=None, char=None,
-                 form=None, number=-1, rename=None,
-                 prefix=False, suffix=True, files=[]):
+                 form=None, number=-1, rename=None, git=False,
+                 prefix=False, suffix=False, files=[]):
         self.in_folder = in_folder
         if ot_folder == None:
             self.ot_folder = in_folder
@@ -47,8 +51,10 @@ class rename_git:
     # execution for command line
     def exec_opt(self, argv):
         try:
-            opts, args = getopt.getopt(argv, "hi:o:c:f:n:r:ps",
-                                       ["help", "input=", "output=", "char=", "form=", "number=", "rename=", "prefix", "suffix"])
+            opts, args = getopt.getopt(argv, "hi:o:c:f:n:r:psg",
+                                       ["help", "input=", "output=",
+                                       "char=", "form=", "number=", "rename=", 
+                                       "prefix", "suffix", "git"])
         except getopt.GetoptError:
             print("Error: invalid usage")
             print()
@@ -74,6 +80,8 @@ class rename_git:
                 self.prefix = True
             elif opt in ("-s", "--suffix"):
                 self.suffix = True
+            elif opt in ("-g", "--git"):
+                self.git = True
             else:
                 # print error info && exit
                 print("rename_git.py: invalid option", opt)
@@ -211,8 +219,19 @@ class rename_git:
                           self.ot_folder+self.rename+"_"+str(i)+base_split[1])
                 i += 1
 
+    # TODO: simple history changed recording without gitpython module, like git
     def exec_git(self):
-        pass
+        git_commit = time.strftime("%Y%m%d %H:%M:%S", time.localtime())
+        # check .git exit on output folder
+        try:
+            repo = Repo(self.ot_folder)
+            print("git exit, add change log")
+        except GExc.InvalidGitRepositoryError:
+            repo = Repo.init(self.ot_folder)
+            print("Initialised git")
+        repo.git.add(A=True)
+        repo.index.commit(git_commit)
+        print("finish to add change log")
 
     def exec_main(self, argv):
         self.exec_opt(argv)
@@ -225,6 +244,10 @@ class rename_git:
         else:
             print("Error: unknown error!")
             self.usage()
+            sys.exit(2)
+        if self.git:
+            # TODO: cannot recover files if it is first to initialise git
+            self.exec_git()
         return
 
     #################### HELP ####################
@@ -243,6 +266,7 @@ class rename_git:
         print("-i, --input \t directory of files required to rename")
         print()
         print("Option:")
+        print("-g, --git \t store git history in git, require git")
         print("-o, --output \t directory where renamed fires move to")
         print("-h, --help \t list all the helps and exit")
         print("-c, --char \t add same char on files, combined with -p | -s")

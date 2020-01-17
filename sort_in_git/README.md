@@ -28,3 +28,4 @@ The git is used for recording files changed history.
     Options:
     -h, --help        list all help and exit
     -o, --output      directory that keeps all sorted file
+    -g, --git         store git history in git
