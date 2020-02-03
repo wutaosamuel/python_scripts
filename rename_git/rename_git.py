@@ -261,8 +261,10 @@ class rename_git:
             self.exec_rename()
         elif not self.form == None:
             self.exec_form()
-        elif self.char != None or self.number != -1:
+        elif self.char != None or self.number != -1 and not self.delete:
             self.exec_ps()
+        elif self.delete:
+            self.exec_delete()
         else:
             print("Error: unknown error!")
             self.usage()
