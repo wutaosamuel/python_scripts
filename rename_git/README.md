@@ -9,7 +9,8 @@ extra:
 
 1. rename all file at the same directory with --number
 2. add prefix or suffix with --number & --char (fixed)
-3. change extension from --form .txt to --char .doc
+3. del prefix or suffix.
+4. change extension from --form .txt to --char .doc
 
 ## Libraries
 
@@ -29,3 +30,4 @@ extra:
     -r, --rename    rename files with --number
     -p, --prefix    add extra characteristic on the start of file name, default is _
     -s, --suffix    add extra characteristic on the end of file name, default is _
+    -d, --delete    delete first or last characteristics with -s or -p flag

@@ -1,7 +1,8 @@
 # Aims:
 # 1. rename all file at the same directory with --number
 # 2. add prefix or suffix with --number & --char (fixed)
-# 3. change extension from --form .txt to --char .doc
+# 3. del prefix or suffix.
+# 4. change extension from --form .txt to --char .doc
 
 import os
 import sys
@@ -28,13 +29,15 @@ class rename_git:
         self.rename = None
         self.prefix = False
         self.suffix = False
+        self.delete = False
         self.files = []
         self.git = False
 
     # recall variables
     def __call__(self, in_folder=None, ot_folder=None, char=None,
                  form=None, number=-1, rename=None, git=False,
-                 prefix=False, suffix=False, files=[]):
+                 prefix=False, suffix=False, 
+                 delete=False, files=[]):
         self.in_folder = in_folder
         if ot_folder == None:
             self.ot_folder = in_folder
@@ -46,15 +49,16 @@ class rename_git:
         self.rename = rename
         self.prefix = prefix
         self.suffix = suffix
+        self.delete = delete
         self.files = files
 
     # execution for command line
     def exec_opt(self, argv):
         try:
-            opts, args = getopt.getopt(argv, "hi:o:c:f:n:r:psg",
+            opts, args = getopt.getopt(argv, "hi:o:c:f:n:r:psdg",
                                        ["help", "input=", "output=",
                                        "char=", "form=", "number=", "rename=", 
-                                       "prefix", "suffix", "git"])
+                                       "prefix", "suffix", "delete" "git"])
         except getopt.GetoptError:
             print("Error: invalid usage")
             print()
@@ -80,6 +84,8 @@ class rename_git:
                 self.prefix = True
             elif opt in ("-s", "--suffix"):
                 self.suffix = True
+            elif opt in ("-d", "--delete"):
+                self.delete = True
             elif opt in ("-g", "--git"):
                 self.git = True
             else:
@@ -218,6 +224,22 @@ class rename_git:
                 os.rename(self.in_folder+f,
                           self.ot_folder+self.rename+"_"+str(i)+base_split[1])
                 i += 1
+    
+    # del first or last characteristics with -p && -f
+    def exec_delete(self):
+        i = self.number if self.number >= 0 else 1
+        if self.suffix:
+            for f in self.files:
+                base_split = os.path.splitext(f)
+                if len(base_split[0]) > i:
+                    os.rename(self.in_folder+f,
+                            self.ot_folder+base_split[0][:-i]+base_split[1])
+        if self.prefix or not self.prefix and not self.suffix:
+            for f in self.files:
+                base_split = os.path.splitext(f)
+                if len(base_split[0]) > i:
+                    os.rename(self.in_folder+f,
+                            self.ot_folder+base_split[0][i:]+base_split[1])
 
     # TODO: simple history changed recording without gitpython module, like git
     def exec_git(self):
@@ -276,6 +298,7 @@ class rename_git:
         print("-p, --prefix \t add extra characteristic on the start of file name, default is _")
         print(
             "-s, --suffix \t add extra characteristic on the end of file name, default is _")
+        print("-d, --delete \t delete first or last charateristics with -s or -p flag")
 
         # TODO: rename all files with options
         sys.exit(0)
