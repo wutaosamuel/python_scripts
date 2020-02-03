@@ -296,8 +296,7 @@ class rename_git:
         print("-f, --form \t change form of files, e.g. mp4 of a.mp4")
         print("-r, --rename \t rename files with --number")
         print("-p, --prefix \t add extra characteristic on the start of file name, default is _")
-        print(
-            "-s, --suffix \t add extra characteristic on the end of file name, default is _")
+        print("-s, --suffix \t add extra characteristic on the end of file name, default is _")
         print("-d, --delete \t delete first or last charateristics with -s or -p flag")
 
         # TODO: rename all files with options
