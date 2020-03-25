@@ -1,10 +1,11 @@
 # Aims:
-# 1. build .dep in terms of architecture
+# 1. build .deb in terms of architecture
 
 # requirement:
 # TODO: deb package dir tree
 
 import os
+import sys
 import glob
 import hashlib
 import platform
@@ -17,20 +18,21 @@ class python_debian_package:
     self.debian = None
     self.name=None
     self.system = self.detectSys()
-    self.architecture = detectArch()
+    self.architecture = self.detectArch()
     self.version = -1
     self.make = None
+
+  def exec_opt(self):
+    pass
   
   def detectSys(self):
+    # FIXME: more system detail
     sys = platform.system()
     if sys == "Linux":
       return "linux"
-    if sys == "Windows":
-      return "windows"
-    if sys == "Darwin":
-      return "darwin"
     else:
       print(sys+" is not support")
+      print("Linux system only")
       self.print_help()
 
   def detectArch(self):
@@ -107,6 +109,12 @@ class python_debian_package:
       md5data += md5s[line] + "  " + files[line]
     with os.open(md5file, "w") as md5f:
       md5f.writelines(md5data)
+  
+  def exec_make(self):
+    os.system(self.make)
+  
+  def exec_deb(self):
+    pass
 
   ################## HELP ###################
 
@@ -119,4 +127,20 @@ class python_debian_package:
     self.print_more_help()
 
   def print_help(self):
-    pass
+    helpstring = '''
+    -n, --name     name of target program
+    -s, --system   target system
+    -a, --arch     target architecture
+    -V, --Version  target version
+
+    Option:
+    -m, --make     make binary package by Makefile
+    '''
+    self.usage()
+    print()
+    print(helpstring)
+    sys.exit(0)
+
+if __name__ == "__main__":
+  deb = python_debian_package()
+  print(deb.print_help())
