@@ -10,7 +10,7 @@ from urllib.request import urlopen
 class ping:
     def __init__(self, url=["https://www.baidu.com",
                             "https://www.google.com",
-                            "https://www.bilibili.com",
+                            "https://www.aliyun.com",
                             "https://www.kickstarter.com",
                             "https://github.com"],
                  dns=["1.1.1.1", "8.8.8.8", "1.0.0.1", "119.29.29.29", "223.5.5.5"]):
@@ -50,6 +50,8 @@ class ping:
     def check_url(self, url=None):
         if url == None:
             url = self.url
+        if url == ["[]"]:
+            return True
         count = 0
         size = len(url)
         for u in url:
@@ -67,6 +69,8 @@ class ping:
     def check_dns(self, dns=None):
         if dns == None:
             dns = self.dns
+        if dns == ["[]"]:
+            return True
         count = 0
         size = len(dns)
         for d in dns:
