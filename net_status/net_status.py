@@ -31,7 +31,7 @@ class ping:
                             help="execute command after this action",
                             type=str, nargs="?", required=False)
         parser.add_argument("-f", "--flag",
-                            help="execute command under certain circumstances(net False or True)",
+                            help="execute command under certain circumstances(default: net False and call -f for net is True)",
                             type=bool, nargs="?", required=False)
 
         args = parser.parse_args()
