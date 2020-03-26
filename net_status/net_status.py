@@ -32,7 +32,7 @@ class ping:
                             type=str, nargs="?", required=False)
         parser.add_argument("-f", "--flag",
                             help="execute command under certain circumstances(default: net False and call -f for net is True)",
-                            type=bool, nargs="?", required=False)
+                            action="store_true", default=False)
 
         args = parser.parse_args()
         if args.url != None:
@@ -41,8 +41,7 @@ class ping:
             self.dns = args.dns
         if args.command != None:
             self.command = args.command
-        if args.flag != None:
-            self.flag = args.flag
+        self.flag = args.flag
 
     def __call__(self, url=["www.baidu.com"], dns=["1.1.1.1"]):
         self.url = url
