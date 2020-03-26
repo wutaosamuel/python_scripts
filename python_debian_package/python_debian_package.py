@@ -8,6 +8,7 @@ import os
 import sys
 import glob
 import hashlib
+import argparse
 import platform
 
 class python_debian_package:
@@ -19,11 +20,50 @@ class python_debian_package:
     self.name=None
     self.system = self.detectSys()
     self.architecture = self.detectArch()
-    self.version = -1
+    self.version = "1.0.0"
+    self.flag = None
     self.make = None
 
-  def exec_opt(self):
-    pass
+  def exec_arg(self):
+    parser = argparser.ArgumentParser()
+    parser.add_argument("-i", "--input",
+                        help="parent directory for making dep package",
+                        type=str, nargs="?", required=True)
+    parser.add_argument("-n", "--name",
+                        help="name of debian package",
+                        type=str, nargs="?", required=True)
+    parser.add_argument("-s", "--system",
+                        help="target system for go building",
+                        type=str, nargs="+", required=True)
+    parser.add_argument("-a", "--architecture",
+                        help="target architecture for go building",
+                        type=str, nargs="+", required=True)
+    parser.add_argument("-V", "--Version",
+                        help="deb package version",
+                        type=str, nargs="+", required=False)
+    parser.add_argument("-f", "--flag",
+                        help="flag for go build",
+                        type=str, nargs="+", required=False)
+    
+    args = parser.parse_args()
+    self.deb_dir = args.input
+    self.name = args.name
+    self.system = args.system
+    self.architecture = args.architecture
+    self.version = args.Version
+    if args.flag != None:
+      self.flag = args.flag
+    if args.Version != None:
+      self.version = args.Version
+    
+    # check all parameter
+    if not os.path.isdir(self.deb_dir):
+      parser.print_help()
+      os.exit(1)
+    if len(self.system) != len(self.architecture):
+      print("No. of system should same as No. of architectures")
+      parser.print_help()
+      os.exit(1)
   
   def detectSys(self):
     # FIXME: more system detail
@@ -127,18 +167,8 @@ class python_debian_package:
     self.print_more_help()
 
   def print_help(self):
-    helpstring = '''
-    -n, --name     name of target program
-    -s, --system   target system
-    -a, --arch     target architecture
-    -V, --Version  target version
-
-    Option:
-    -m, --make     make binary package by Makefile
-    '''
     self.usage()
     print()
-    print(helpstring)
     sys.exit(0)
 
 if __name__ == "__main__":
