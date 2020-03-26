@@ -261,8 +261,10 @@ class rename_git:
             self.exec_rename()
         elif not self.form == None:
             self.exec_form()
-        elif self.char != None or self.number != -1:
+        elif self.char != None or self.number != -1 and not self.delete:
             self.exec_ps()
+        elif self.delete:
+            self.exec_delete()
         else:
             print("Error: unknown error!")
             self.usage()
@@ -296,8 +298,7 @@ class rename_git:
         print("-f, --form \t change form of files, e.g. mp4 of a.mp4")
         print("-r, --rename \t rename files with --number")
         print("-p, --prefix \t add extra characteristic on the start of file name, default is _")
-        print(
-            "-s, --suffix \t add extra characteristic on the end of file name, default is _")
+        print("-s, --suffix \t add extra characteristic on the end of file name, default is _")
         print("-d, --delete \t delete first or last charateristics with -s or -p flag")
 
         # TODO: rename all files with options
