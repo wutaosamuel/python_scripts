@@ -17,5 +17,5 @@
 -u, --url             url for checking network status
 -d, --dns             dns for checking network status
 -c, --command         execute command after this action
--f, --flag            execute command under certain circumstances (True for network connected, vice versa)
+-f, --flag            execute command under certain circumstances (default: detect network is not connect and then do command, call -f, detect network is connect)
 ```

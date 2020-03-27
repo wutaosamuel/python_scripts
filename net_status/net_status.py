@@ -10,7 +10,7 @@ from urllib.request import urlopen
 class ping:
     def __init__(self, url=["https://www.baidu.com",
                             "https://www.google.com",
-                            "https://www.bilibili.com",
+                            "https://www.aliyun.com",
                             "https://www.kickstarter.com",
                             "https://github.com"],
                  dns=["1.1.1.1", "8.8.8.8", "1.0.0.1", "119.29.29.29", "223.5.5.5"]):
@@ -31,8 +31,8 @@ class ping:
                             help="execute command after this action",
                             type=str, nargs="?", required=False)
         parser.add_argument("-f", "--flag",
-                            help="execute command under certain circumstances(net False or True)",
-                            type=bool, nargs="?", required=False)
+                            help="execute command under certain circumstances(default: net False and call -f for net is True)",
+                            action="store_true", default=False)
 
         args = parser.parse_args()
         if args.url != None:
@@ -41,8 +41,7 @@ class ping:
             self.dns = args.dns
         if args.command != None:
             self.command = args.command
-        if args.flag != None:
-            self.flag = args.flag
+        self.flag = args.flag
 
     def __call__(self, url=["www.baidu.com"], dns=["1.1.1.1"]):
         self.url = url
@@ -51,6 +50,8 @@ class ping:
     def check_url(self, url=None):
         if url == None:
             url = self.url
+        if url == ["[]"]:
+            return True
         count = 0
         size = len(url)
         for u in url:
@@ -68,6 +69,8 @@ class ping:
     def check_dns(self, dns=None):
         if dns == None:
             dns = self.dns
+        if dns == ["[]"]:
+            return True
         count = 0
         size = len(dns)
         for d in dns:
