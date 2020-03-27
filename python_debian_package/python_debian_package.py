@@ -13,7 +13,6 @@ import platform
 
 class python_debian_package:
 
-  # FIXME: auto multi arch
   def __init__(self, deb_dir=None):
     self.deb_dir = deb_dir
     self.debian = None
@@ -25,6 +24,7 @@ class python_debian_package:
     self.make = None
 
   def exec_arg(self):
+    # TODO: provide go build command
     parser = argparser.ArgumentParser()
     parser.add_argument("-i", "--input",
                         help="parent directory for making dep package",
@@ -32,12 +32,15 @@ class python_debian_package:
     parser.add_argument("-n", "--name",
                         help="name of debian package",
                         type=str, nargs="?", required=True)
-    parser.add_argument("-s", "--system",
-                        help="target system for go building",
-                        type=str, nargs="+", required=True)
     parser.add_argument("-a", "--architecture",
                         help="target architecture for go building",
                         type=str, nargs="+", required=True)
+    parser.add_argument("-s", "--system",
+                        help="target system for go building",
+                        type=str, nargs="+", required=False)
+    parser.add_argument("-m", "--make",
+                        help="make command for build program, Makefile required",
+                        type=str, nargs="+", required=False)
     parser.add_argument("-V", "--Version",
                         help="deb package version",
                         type=str, nargs="+", required=False)
@@ -48,32 +51,41 @@ class python_debian_package:
     args = parser.parse_args()
     self.deb_dir = args.input
     self.name = args.name
-    self.system = args.system
     self.architecture = args.architecture
     self.version = args.Version
+    if args.system != None:
+      self.system = args.system
     if args.flag != None:
       self.flag = args.flag
     if args.Version != None:
       self.version = args.Version
+    if args.make != None:
+      self.make = args.make
     
     # check all parameter
     if not os.path.isdir(self.deb_dir):
       parser.print_help()
       os.exit(1)
-    if len(self.system) != len(self.architecture):
-      print("No. of system should same as No. of architectures")
-      parser.print_help()
-      os.exit(1)
+    if not self.system == None:
+      if len(self.system) != len(self.architecture):
+        print("No. of system should same as No. of architectures")
+        parser.print_help()
+        os.exit(1)
+    if not self.make == None:
+      if len(self.make) != len(self.architecture):
+        print("No. of make command should same as No. of architectures")
+        parser.print_help()
+        os.exit(1)
   
   def detectSys(self):
-    # FIXME: more system detail
-    sys = platform.system()
-    if sys == "Linux":
-      return "linux"
-    else:
-      print(sys+" is not support")
-      print("Linux system only")
-      self.print_help()
+    #sys = platform.system()
+    #if sys == "Linux":
+      #return "linux"
+    #else:
+      #print(sys+" is not support")
+      #print("Linux system only")
+      #self.print_help()
+    return platform.system()
 
   def detectArch(self):
     arch = platform.machine()
@@ -91,7 +103,6 @@ class python_debian_package:
       self.print_help()
   
   def replace_control(self, version=None, architecture=None):
-    # FIXME: modified multi arch
     if version == None or architecture == None:
       print("Please enter version or architecture")
       self.print_help()
@@ -151,11 +162,24 @@ class python_debian_package:
       md5f.writelines(md5data)
   
   def exec_make(self):
-    os.system(self.make)
-  
-  def exec_deb(self):
+    for index in range(self.make):
+      # replace version and architecture in control file
+      self.replace_control(self.version, self.architecture[index])
+      # make binary exectution
+      os.system(self.make[index])
+      # calculate md5sums of ./usr/*
+      self.md5sums()
+      # build debian package
+      debname = self.name+"_"+self.version+"_"+self.architecture[index]+".deb"
+      os.system("dpkg -b "+self.debian+" "+debname)
+
+  def exec_build(self):
     pass
 
+  def exec_main(self):
+    self.exec_arg()
+    self.exec_make()
+  
   ################## HELP ###################
 
   def print_more_help(self):
@@ -173,4 +197,4 @@ class python_debian_package:
 
 if __name__ == "__main__":
   deb = python_debian_package()
-  print(deb.print_help())
+  deb.exec_main()
