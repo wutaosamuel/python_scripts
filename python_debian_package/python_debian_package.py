@@ -17,7 +17,7 @@ class python_debian_package:
     self.deb_dir = deb_dir
     self.debian = None
     self.name=None
-    self.system = self.detectSys()
+    self.system = None
     self.architecture = self.detectArch()
     self.version = "1.0.0"
     self.flag = None
@@ -25,7 +25,7 @@ class python_debian_package:
 
   def exec_arg(self):
     # TODO: provide go build command
-    parser = argparser.ArgumentParser()
+    parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input",
                         help="parent directory for making dep package",
                         type=str, nargs="?", required=True)
@@ -52,7 +52,8 @@ class python_debian_package:
     self.deb_dir = args.input
     self.name = args.name
     self.architecture = args.architecture
-    self.version = args.Version
+    if args.Version != None:
+      self.version = args.Version
     if args.system != None:
       self.system = args.system
     if args.flag != None:
@@ -65,17 +66,20 @@ class python_debian_package:
     # check all parameter
     if not os.path.isdir(self.deb_dir):
       parser.print_help()
-      os.exit(1)
+      sys.exit(1)
     if not self.system == None:
       if len(self.system) != len(self.architecture):
         print("No. of system should same as No. of architectures")
         parser.print_help()
-        os.exit(1)
+        sys.exit(1)
     if not self.make == None:
       if len(self.make) != len(self.architecture):
         print("No. of make command should same as No. of architectures")
         parser.print_help()
-        os.exit(1)
+        sys.exit(1)
+    
+    # set extra value
+    self.system = self.detectSys()
   
   def detectSys(self):
     #sys = platform.system()
@@ -106,8 +110,8 @@ class python_debian_package:
     if version == None or architecture == None:
       print("Please enter version or architecture")
       self.print_help()
-    deb = os.path.join(deb_dir, "debian")
-    Deb = os.path.join(deb_dir, "DEBIAN")
+    deb = os.path.join(self.deb_dir, "debian")
+    Deb = os.path.join(self.deb_dir, "DEBIAN")
     if os.path.exists(deb):
       self.debian = deb
     if os.path.exists(Deb):
@@ -119,26 +123,26 @@ class python_debian_package:
     if not os.path.exists(control):
       print("no such "+control+" file")
     # replace version and architecture
-    file_data = ""
-    with os.open(control, "rw") as f:
+    file_data = []
+    with open(control, "r") as f:
       for line in f:
         if "Version" in line:
-          line = line.replace("Version:"+version)
+          line = "Version:"+version+"\n"
         if "Architecture" in line:
-          line = line.replace("Architecture:"+architecture)
-        file_data += line
-    with os.open(control, "rw") as f:
+          line = "Architecture:"+architecture+"\n"
+        file_data.append(line)
+    with open(control, "w") as f:
       f.writelines(file_data)
   
   def md5sum(self):
-    usr = os.path.join(deb_dir, "usr")
+    usr = os.path.join(self.deb_dir, "usr")
     files = []
     md5s = []
     # recode files and each md5 sum
     for f in sorted(
       glob.glob(os.path.join(usr, "**"), recursive=True)):
       if os.path.isfile(f):
-        with os.open(f, "rb") as content:
+        with open(f, "r") as content:
           md5 = hashlib.md5(content.encode("utf-8")).hexdigest()
         # reformat: ./usr/*
         filesplit = os.path.split(f)
@@ -155,20 +159,20 @@ class python_debian_package:
     # format of md5sums:
     # 3q2...  ./usr/**
     md5file = os.path.join(self.debian, "md5sums")
-    md5data = ""
+    md5data = []
     for line in range(len(files)):
-      md5data += md5s[line] + "  " + files[line]
-    with os.open(md5file, "w") as md5f:
+      md5data.append(md5s[line] + "  " + files[line])
+    with open(md5file, "w") as md5f:
       md5f.writelines(md5data)
   
   def exec_make(self):
-    for index in range(self.make):
+    for index in range(len(self.make)):
       # replace version and architecture in control file
       self.replace_control(self.version, self.architecture[index])
       # make binary exectution
       os.system(self.make[index])
       # calculate md5sums of ./usr/*
-      self.md5sums()
+      self.md5sum()
       # build debian package
       debname = self.name+"_"+self.version+"_"+self.architecture[index]+".deb"
       os.system("dpkg -b "+self.debian+" "+debname)
