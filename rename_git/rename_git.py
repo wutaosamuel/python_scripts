@@ -50,15 +50,16 @@ class rename_git:
         self.prefix = prefix
         self.suffix = suffix
         self.delete = delete
+        self.list = False
         self.files = files
 
     # execution for command line
     def exec_opt(self, argv):
         try:
-            opts, args = getopt.getopt(argv, "hi:o:c:f:n:r:psdg",
+            opts, args = getopt.getopt(argv, "hi:o:c:f:n:r:psdgl",
                                        ["help", "input=", "output=",
                                        "char=", "form=", "number=", "rename=", 
-                                       "prefix", "suffix", "delete" "git"])
+                                       "prefix", "suffix", "delete","git", "list"])
         except getopt.GetoptError:
             print("Error: invalid usage")
             print()
@@ -88,6 +89,8 @@ class rename_git:
                 self.delete = True
             elif opt in ("-g", "--git"):
                 self.git = True
+            elif opt in ("-l", "--list")
+                self.list = True
             else:
                 # print error info && exit
                 print("rename_git.py: invalid option", opt)
@@ -265,6 +268,8 @@ class rename_git:
             self.exec_ps()
         elif self.delete:
             self.exec_delete()
+        elif self.list:
+            print(self.files)
         else:
             print("Error: unknown error!")
             self.usage()
@@ -277,10 +282,10 @@ class rename_git:
     #################### HELP ####################
 
     def print_more_help(self):
-        print("rename_git.py \'-h\' | \'--help\' for more helps")
+        print("rename_git \'-h\' | \'--help\' for more helps")
 
     def usage(self):
-        print("rename_git.py [-i <inputfolder>] [option]")
+        print("rename_git [-i <inputfolder>] [option]")
         print("or")
         self.print_more_help()
 
