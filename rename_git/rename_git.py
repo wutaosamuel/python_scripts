@@ -89,7 +89,7 @@ class rename_git:
                 self.delete = True
             elif opt in ("-g", "--git"):
                 self.git = True
-            elif opt in ("-l", "--list")
+            elif opt in ("-l", "--list"):
                 self.list = True
             else:
                 # print error info && exit
